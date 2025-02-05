@@ -1,5 +1,6 @@
 package com.seanaujong.myprofile.di
 
+import com.google.firebase.BuildConfig
 import com.google.firebase.auth.FirebaseAuth
 import com.seanaujong.myprofile.data.auth.AuthRepository
 import com.seanaujong.myprofile.data.auth.CurrentUserProvider
@@ -23,7 +24,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFireBaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun provideFireBaseAuth(): FirebaseAuth = FirebaseAuth.getInstance().apply {
+        this.useEmulator("10.0.2.2", 9099)
+    }
 
     @Provides
     @Singleton
