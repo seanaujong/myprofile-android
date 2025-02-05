@@ -1,9 +1,11 @@
 package com.seanaujong.myprofile.usecase
 
-import com.seanaujong.myprofile.data.auth.AuthRepository
-
-class SignOut(private val authRepository: AuthRepository) {
+class SignOut(private val signOutProvider: SignOutProvider) {
     operator fun invoke() {
-        authRepository.signOut()
+        signOutProvider.signOut()
     }
+}
+
+interface SignOutProvider {
+    fun signOut()
 }

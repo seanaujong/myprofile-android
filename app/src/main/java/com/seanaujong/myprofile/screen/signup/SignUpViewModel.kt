@@ -1,10 +1,13 @@
 package com.seanaujong.myprofile.screen.signup
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.seanaujong.myprofile.internal.Response
 import com.seanaujong.myprofile.usecase.SignUp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,12 +19,12 @@ class SignupViewModel @Inject constructor(
     val signupState: StateFlow<SignupState> = _signupState
 
     fun signUp(email: String, password: String) {
-        _signupState.value = SignupState.Loading
-        signUpUseCase(email, password) { success ->
-            _signupState.value = if (success) {
-                SignupState.Success
-            } else {
-                SignupState.Error("Sign-up failed")
+        viewModelScope.launch {
+            _signupState.value = SignupState.Loading
+            val response = signUpUseCase(email, password)
+            _signupState.value = when (response) {
+                is Response.Success -> SignupState.Success
+                is Response.Error -> SignupState.Error(response.message)
             }
         }
     }

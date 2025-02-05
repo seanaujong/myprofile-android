@@ -1,10 +1,13 @@
 package com.seanaujong.myprofile.screen.login
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.seanaujong.myprofile.internal.Response
 import com.seanaujong.myprofile.usecase.SignIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,9 +19,13 @@ class LoginViewModel @Inject constructor(
     val loginState: StateFlow<LoginState> = _loginState
 
     fun login(email: String, password: String) {
-        _loginState.value = LoginState.Loading
-        signIn(email, password) { success ->
-            _loginState.value = if (success) LoginState.Success else LoginState.Error("Login failed")
+        viewModelScope.launch {
+            _loginState.value = LoginState.Loading
+            val response = signIn(email, password)
+            when (response) {
+                is Response.Success -> LoginState.Success
+                is Response.Error -> LoginState.Error(response.message)
+            }
         }
     }
 }
